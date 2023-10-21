@@ -1,7 +1,9 @@
+import { injectable } from "inversify";
 import Book from "../model/Book";
 import BooksRepository from "../repositories/books.repository";
 
-export class Books extends BooksRepository {
+@injectable()
+export default class Books extends BooksRepository {
 	async createBook(book: typeof Book) {
 		const newBook = new Book(book);
 		await newBook.save();
