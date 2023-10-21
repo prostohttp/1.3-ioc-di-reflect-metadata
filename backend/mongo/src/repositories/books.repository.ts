@@ -1,9 +1,11 @@
-// const Book = require("../model/Book");
+import Book from "../model/Book";
 
-export abstract class BooksRepository {
-  abstract createBook(book: Book): void
-  abstract getBook(id: number): Book
-  abstract getBooks(): Book[]
-  abstract updateBook(book: Book): void
-  abstract deleteBook(id: number): void
+abstract class BooksRepository {
+	abstract getBooks();
+	abstract getBook(id: number)
+	abstract createBook(book: typeof Book);
+	abstract updateBook(book: typeof Book, id: number);
+	abstract deleteBook(id: number);
 }
+
+export default BooksRepository;

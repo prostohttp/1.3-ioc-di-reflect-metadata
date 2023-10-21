@@ -1,8 +1,11 @@
-const Book = require("../model/Book");
+const Books = require("./Books");
+const container = require("../containers/container");
+
+const repo = container.get(Books);
 
 const getAllBooksHandler = async (_, res) => {
 	try {
-		const books = await Book.find().select("-__v");
+		const books = await repo.getBooks();
 		res.json(books);
 	} catch (error) {
 		res.status(500).json(error);
@@ -10,9 +13,9 @@ const getAllBooksHandler = async (_, res) => {
 };
 
 const getBookHandler = async (req, res) => {
-	const { id } = req.params;
 	try {
-		const book = await Book.findById(id).select("-__v");
+		const { id } = req.params;
+		const book = await repo.getBook(id);
 		if (book) {
 			res.json(book);
 		} else {
@@ -24,42 +27,42 @@ const getBookHandler = async (req, res) => {
 };
 
 const addBookHandler = async (req, res) => {
-	const {
-		id,
-		title,
-		description,
-		authors,
-		favorite,
-		fileName,
-		filecover,
-		filebook,
-		originalNameFileCover,
-		originalNameFileBook,
-	} = req.body;
-	const book = new Book({
-		id,
-		title,
-		description,
-		authors,
-		favorite,
-		filecover,
-		filebook,
-		fileName,
-		originalNameFileCover,
-		originalNameFileBook,
-	});
 	try {
-		await book.save();
-		res.status(201).json(book);
+		const {
+			id,
+			title,
+			description,
+			authors,
+			favorite,
+			fileName,
+			filecover,
+			filebook,
+			originalNameFileBook,
+			originalNameFileCover,
+		} = req.body;
+		const book = {
+			id,
+			title,
+			description,
+			authors,
+			favorite,
+			fileName,
+			filecover,
+			filebook,
+			originalNameFileBook,
+			originalNameFileCover,
+		};
+		const newBook = await repo.createBook(book);
+		res.status(201).json(newBook);
 	} catch (error) {
 		res.status(500).json(error.message);
 	}
 };
 
 const deleteBookHandler = async (req, res) => {
-	const { id } = req.params;
 	try {
-		await Book.findByIdAndDelete(id);
+		const { id } = req.params;
+		await repo.deleteBook(id);
 		res.status(200).json({ message: "ok" });
 	} catch (error) {
 		res.status(500).json(error.message);
@@ -67,7 +70,7 @@ const deleteBookHandler = async (req, res) => {
 };
 
 const updateBookHandler = async (req, res) => {
-	const {id} = req.params;
+	const { id } = req.params;
 	const {
 		title,
 		description,
@@ -92,8 +95,8 @@ const updateBookHandler = async (req, res) => {
 		originalNameFileBook,
 	};
 	try {
-		await Book.findByIdAndUpdate(id, book);
-		res.json({message: "ok"});
+		repo.updateBook(book, id);
+		res.json({ message: "ok" });
 	} catch (error) {
 		res.status(500).json(error.message);
 	}
@@ -104,5 +107,5 @@ module.exports = {
 	getAll: getAllBooksHandler,
 	add: addBookHandler,
 	delete: deleteBookHandler,
-	update: updateBookHandler
+	update: updateBookHandler,
 };
